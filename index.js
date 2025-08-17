@@ -4,7 +4,7 @@ import axios from "axios";
 const app = express();
 app.use(express.json());
 
-const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/XXXXXXXXX/YYYYYYYYYY"; // <-- your Discord webhook
+const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1406654401107722420/CktYMYzpde3u8LYrmZ4QaBAJI3c4QfevPq6hH1tokp0ibQfXeWzEm7PP2ftaTZyqdZwZ"; // <-- your Discord webhook
 
 app.get("/", (req, res) => res.send("✅ GitHub → Discord Webhook is running!"));
 
@@ -33,5 +33,5 @@ app.post("/github", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
