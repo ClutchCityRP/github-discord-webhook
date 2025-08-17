@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 // Replace this with your Discord webhook
-const DISCORD_WEBHOOK = "YOUR_DISCORD_WEBHOOK_URL";
+const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1406654401107722420/CktYMYzpde3u8LYrmZ4QaBAJI3c4QfevPq6hH1tokp0ibQfXeWzEm7PP2ftaTZyqdZwZ";
 
 // Handle GitHub Webhook events
 app.post("/github", async (req, res) => {
