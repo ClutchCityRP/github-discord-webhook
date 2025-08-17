@@ -4,34 +4,49 @@ import axios from "axios";
 const app = express();
 app.use(express.json());
 
-const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1406654401107722420/CktYMYzpde3u8LYrmZ4QaBAJI3c4QfevPq6hH1tokp0ibQfXeWzEm7PP2ftaTZyqdZwZ"; // <-- your Discord webhook
+// Replace this with your Discord webhook
+const DISCORD_WEBHOOK = "YOUR_DISCORD_WEBHOOK_URL";
 
-app.get("/", (req, res) => res.send("✅ GitHub → Discord Webhook is running!"));
-
+// Handle GitHub Webhook events
 app.post("/github", async (req, res) => {
   try {
-    const body = req.body;
+    const payload = req.body;
 
-    if (body.commits && body.commits.length > 0) {
-      for (const commit of body.commits) {
-        const message =
-          `📢 **New Commit in ${body.repository.full_name}**\n` +
-          `📝 ${commit.message}\n` +
-          `👤 ${commit.author.name}\n` +
-          `🔗 ${commit.url}`;
+    const repoName = payload.repository?.full_name || "Unknown Repo";
+    const repoUrl = payload.repository?.html_url || "";
 
-        await axios.post(DISCORD_WEBHOOK, {
-          content: message,
-        });
-      }
+    // If no commits, ignore
+    if (!payload.commits || payload.commits.length === 0) {
+      return res.status(200).send("No commits found");
     }
 
-    res.status(200).send("OK");
-  } catch (error) {
-    console.error("Error sending to Discord:", error.message);
+    // Create embed for each commit
+    const embeds = payload.commits.map((commit) => ({
+      title: `📌 Commit in ${repoName}`,
+      url: commit.url,
+      description: `**${commit.message}**`,
+      color: 0x00ff00, // Green
+      fields: [
+        { name: "Author", value: commit.author?.name || "Unknown", inline: true },
+        { name: "Repository", value: `[${repoName}](${repoUrl})`, inline: true }
+      ],
+      timestamp: new Date(commit.timestamp)
+    }));
+
+    // Send to Discord
+    await axios.post(DISCORD_WEBHOOK, {
+      username: "GitHub Notifier",
+      embeds: embeds
+    });
+
+    res.status(200).send("Notification sent to Discord");
+  } catch (err) {
+    console.error("Error sending to Discord:", err.message);
     res.status(500).send("Error");
   }
 });
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
